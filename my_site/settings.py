@@ -21,13 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-r=xs%7_*-!@uo(kb0=o=mf3)@0@3apvq_r=)lm*la4#e3-h@_o"
+SECRET_KEY = getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv("IS_DEVELOPMENT", True)
 
 ALLOWED_HOSTS = [
-    getenv("APP_HOST")
+    getenv("APP_HOST"),
+    "127.0.0.1"
 ]
 
 
@@ -35,6 +36,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     "blog",
+    "storages",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -81,8 +83,12 @@ WSGI_APPLICATION = "my_site.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": 'postgres',
+        'USER': getenv("DATABASE_USER"),
+        'PASSWORD': getenv("DATABASE_PASSWORD"),
+        'HOST': getenv("DATABASE_HOST"),
+        'PORT': getenv("DATABASE_PORT")
     }
 }
 
@@ -136,3 +142,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_ROOT = BASE_DIR / "uploads"
 MEDIA_URL = "/files/"
+
+AWS_STORAGE_BUCKET_NAME = getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = getenv("S3_REGION_NAME")
+AWS_ACCESS_KEY_ID = getenv("S3_ACCESSKEY")
+AWS_SECRET_ACCESS_KEY = getenv("S3_SECRET_ACCESSKEY")
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+
+STATICFILES_FOLDER = "static"
+MEDIAFILES_FOLDER = "media"
+
+STATICFILES_STORAGE = "my_site.custom_storages.StaticFileStorage"
+DEFAULT_FILE_STORAGE = "my_site.custom_storages.MediaFileStorage"
